@@ -7,19 +7,28 @@ android {
     dataBinding {
         enabled = true
     }
+    signingConfigs {
+        release {
+            storeFile file('/Users/kheinhtoo/WeesWares/Android/BLE/WW-Health/release.keystore')
+            storePassword 'WWHealth'
+            keyAlias 'WWHealth'
+            keyPassword 'WWHealth'
+        }
+    }
     defaultConfig {
         applicationId "com.weeswares.iok.health"
         minSdk 21
         targetSdk 32
         versionCode 1
         versionName "1.0"
+        signingConfig signingConfigs.release
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
