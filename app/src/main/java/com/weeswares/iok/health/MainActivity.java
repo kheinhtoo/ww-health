@@ -20,7 +20,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -42,24 +41,20 @@ public class MainActivity extends AppCompatActivity {
     private final static int LOCATION_REQUEST_CODE = 521;
     private final static int REQUEST_TURN_ON_BT = 522;
 
-    // TODO: 06/06/2022 replace this with actual value name and characteristic id.
-    private static final String HEART_RATE_DEVICE = "H";
-    private static final String HEART_RATE_DEVICE_CHAR_ID = "uuid";
-    private static final String OXI_METER_DEVICE = "O";
-    private static final String OXI_METER_DEVICE_CHAR_ID = "uuid";
-    private static final String TEMPERATURE_DEVICE = "T";
-    private static final String TEMPERATURE_DEVICE_CHAR_ID = "uuid";
-    private static final String WEIGHT_DEVICE = "W";
-    private static final String WEIGHT_DEVICE_CHAR_ID = "";
+    private static final String HEART_RATE_DEVICE = "BX02-7";// wearable
+    private static final String HEART_RATE_DEVICE_CHAR_ID = "000033f2-0000-1000-8000-00805f9b34fb";
+    private static final String OXI_METER_DEVICE = "Yuwell BP-YE670D";// oximeter
+    private static final String OXI_METER_DEVICE_CHAR_ID = "00002a35-0000-1000-8000-00805f9b34fb";
+    private static final String TEMPERATURE_DEVICE = "Bluetooth BP";// thermometer
+    private static final String TEMPERATURE_DEVICE_CHAR_ID = "0000fff1-0000-1000-8000-00805f9b34fb";
+    private static final String WEIGHT_DEVICE = "KS M6100P";// weight scale
+    private static final String WEIGHT_DEVICE_CHAR_ID = "0000fff1-0000-1000-8000-00805f9b34fb";
 
     private OutputFragment heartRateFragment, temperatureFragment, oximeterFragment, weightFragment = null;
 
     private ActivityMainBinding activityMainBinding;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner leScanner;
-    /**
-     * lescan callback
-     */
     private final ScanCallback leScanCallback = new ScanCallback() {
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
@@ -103,6 +98,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        checkPermission();
     }
 
     @Override
@@ -204,7 +201,6 @@ public class MainActivity extends AppCompatActivity {
             bluetoothAdapter = manager.getAdapter();
             leScanner = bluetoothAdapter.getBluetoothLeScanner();
 
-            Log.d("20F", "start scan <===== ");
             scanDevice(true);
         }
     }

@@ -2,7 +2,6 @@ package com.weeswares.iok.health.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,12 +27,12 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.disposables.Disposable;
 
 public class OutputFragment extends Fragment {
+    private static final String TAG = OutputFragment.class.toString();
 
     private static final String ARG_PARAM1 = "device";
     private static final String ARG_PARAM2 = "title";
     private static final String ARG_PARAM3 = "characteristic_id";
     private static final String ARG_PARAM4 = "notification_support";
-    private static final String TAG = OutputFragment.class.toString();
 
     private Bluetooth bluetooth;
     private String title;
@@ -50,13 +49,13 @@ public class OutputFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static OutputFragment newInstance(Bluetooth b, String title, String charID, boolean notificationSupports) {
+    public static OutputFragment newInstance(Bluetooth b, String title, String charID, boolean notificationSupport) {
         OutputFragment fragment = new OutputFragment();
         Bundle args = new Bundle();
         args.putSerializable(ARG_PARAM1, b);
         args.putString(ARG_PARAM2, title);
         args.putString(ARG_PARAM3, charID);
-        args.putBoolean(ARG_PARAM4, notificationSupports);
+        args.putBoolean(ARG_PARAM4, notificationSupport);
         fragment.setArguments(args);
         return fragment;
     }
@@ -110,7 +109,6 @@ public class OutputFragment extends Fragment {
         rxBleClient = RxBleClient.create(context);
     }
 
-
     void connect(Bluetooth b) {
         if (b == null) return;
         RxBleDevice device = rxBleClient.getBleDevice(b.getMacAddr());
@@ -122,10 +120,21 @@ public class OutputFragment extends Fragment {
 
         connectionListener = device.observeConnectionStateChanges()
                 .subscribe(
-                        connectionState -> displayResult(connectionState.toString()),
+                        this::onConnectionStateChanged,
                         throwable -> displayResult(throwable.getMessage())
                 );
 
+    }
+
+    private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState rxBleConnectionState) {
+        if (RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(rxBleConnectionState)) {
+            connect(bluetooth);
+        }
+        getActivity().runOnUiThread(() -> {
+                    String time = getTimestamp();
+                    binding.setInfo(rxBleConnectionState.toString() + " " + time);
+                }
+        );
     }
 
     private void setUpDataQuery(RxBleConnection rxBleConnection) {
@@ -157,16 +166,18 @@ public class OutputFragment extends Fragment {
     }
 
     private void displayResult(String s) {
-        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
-        String time = format.format(System.currentTimeMillis());
-
+        String time = getTimestamp();
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
-                Log.d(TAG, "addLogs: " + time + " " + s);
                 binding.setValue(s);
                 binding.setInfo(time);
                 binding.setIsConnected(true);
             });
         }
+    }
+
+    private String getTimestamp() {
+        SimpleDateFormat format = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+        return format.format(System.currentTimeMillis());
     }
 }
