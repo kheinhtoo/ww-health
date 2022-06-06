@@ -35,13 +35,13 @@ public class HexString {
         return data;
     }
 
-    public static void weightCalculator(byte[] bytes) {
+    public static void calculateWeight(byte[] bytes) {
         int integerVal = byteArrayToShortLE(bytes, 1);
         System.out.println("Integer = " + integerVal);
         System.out.println("Actual weight =" + (integerVal * 0.005));
     }
 
-    public static void temperatureCalculator(byte[] bytes) {
+    public static void calculateTemperature(byte[] bytes) {
         int integerVal = byteArrayToShortLE(bytes, 1);
         System.out.println("byte[] size is " + bytes.length);
         for (byte b : bytes) {

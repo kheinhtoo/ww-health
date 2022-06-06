@@ -6,6 +6,8 @@
 
     <data>
 
+        <import type="android.widget.TextView" />
+
         <variable
             name="device"
             type="com.weeswares.iok.health.helpers.Bluetooth" />
@@ -17,6 +19,14 @@
         <variable
             name="value"
             type="String" />
+
+        <variable
+            name="info"
+            type="String" />
+
+        <variable
+            name="isConnected"
+            type="java.lang.Boolean" />
     </data>
 
     <com.google.android.material.card.MaterialCardView
@@ -36,26 +46,36 @@
                 android:gravity="center"
                 android:text="@{title}"
                 android:textStyle="bold"
-                tools:text="Title" />
+                tools:text="Heart Rate" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:text="@{value}"
-                android:textSize="20sp"
+                android:text='@{value}'
+                android:textSize="24sp"
                 android:textStyle="bold"
-                tools:text="49" />
+                tools:text="49 bpm" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:gravity="center"
-                android:text="@{device.name}"
+                android:text='@{device.name}'
                 android:textSize="11sp"
                 tools:text="Device name" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text='@{info}'
+                android:textColor='@{isConnected?"#03fc39":"#fc7f03"}'
+                android:textSize="9sp"
+                tools:text="Not connected" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

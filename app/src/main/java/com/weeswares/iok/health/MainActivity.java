@@ -42,10 +42,15 @@ public class MainActivity extends AppCompatActivity {
     private final static int LOCATION_REQUEST_CODE = 521;
     private final static int REQUEST_TURN_ON_BT = 522;
 
-    private final String HEART_RATE_DEVICE = "H";
-    private final String OXI_METER_DEVICE = "O";
-    private final String TEMPERATURE_DEVICE = "T";
-    private final String WEIGHT_DEVICE = "W";
+    // TODO: 06/06/2022 replace this with actual value name and characteristic id.
+    private static final String HEART_RATE_DEVICE = "H";
+    private static final String HEART_RATE_DEVICE_CHAR_ID = "uuid";
+    private static final String OXI_METER_DEVICE = "O";
+    private static final String OXI_METER_DEVICE_CHAR_ID = "uuid";
+    private static final String TEMPERATURE_DEVICE = "T";
+    private static final String TEMPERATURE_DEVICE_CHAR_ID = "uuid";
+    private static final String WEIGHT_DEVICE = "W";
+    private static final String WEIGHT_DEVICE_CHAR_ID = "";
 
     private OutputFragment heartRateFragment, temperatureFragment, oximeterFragment, weightFragment = null;
 
@@ -115,8 +120,8 @@ public class MainActivity extends AppCompatActivity {
     private void checkPermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST_CODE);
+            return;
         }
-
         // scan
         iniBT();
     }
@@ -136,9 +141,7 @@ public class MainActivity extends AppCompatActivity {
                             .setScanMode(SCAN_MODE_LOW_LATENCY)
                             .build();
                 }
-
                 leScanner.startScan(null, settings, leScanCallback);
-
             } else {
                 if (leScanner != null && leScanCallback != null) {
                     if (bluetoothAdapter != null && bluetoothAdapter.isEnabled()) {
@@ -156,19 +159,19 @@ public class MainActivity extends AppCompatActivity {
             Bluetooth b = new Bluetooth(device.getName(), device, result.getRssi());
             if (b.getName().startsWith(HEART_RATE_DEVICE)) {
                 if (heartRateFragment != null) return;
-                heartRateFragment = OutputFragment.newInstance(b, "Heart Rate");
+                heartRateFragment = OutputFragment.newInstance(b, "Heart Rate", HEART_RATE_DEVICE_CHAR_ID, true);
                 autoConnectedDevice(R.id.heart_rate, heartRateFragment);
             } else if (b.getName().startsWith(TEMPERATURE_DEVICE)) {
                 if (temperatureFragment != null) return;
-                temperatureFragment = OutputFragment.newInstance(b, "Temperature");
+                temperatureFragment = OutputFragment.newInstance(b, "Temperature", TEMPERATURE_DEVICE_CHAR_ID, true);
                 autoConnectedDevice(R.id.heart_rate, temperatureFragment);
             } else if (b.getName().startsWith(OXI_METER_DEVICE)) {
                 if (oximeterFragment != null) return;
-                oximeterFragment = OutputFragment.newInstance(b, "Oximeter");
+                oximeterFragment = OutputFragment.newInstance(b, "Oximeter", OXI_METER_DEVICE_CHAR_ID, false);
                 autoConnectedDevice(R.id.heart_rate, oximeterFragment);
             } else if (b.getName().startsWith(WEIGHT_DEVICE)) {
                 if (weightFragment != null) return;
-                weightFragment = OutputFragment.newInstance(b, "Weight");
+                weightFragment = OutputFragment.newInstance(b, "Weight", WEIGHT_DEVICE_CHAR_ID, true);
                 autoConnectedDevice(R.id.heart_rate, weightFragment);
             }
         }
