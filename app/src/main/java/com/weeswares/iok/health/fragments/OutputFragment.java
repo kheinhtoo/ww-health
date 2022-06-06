@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -41,6 +42,7 @@ public class OutputFragment extends Fragment {
 
     private FragmentOutputBinding binding;
     private RxBleClient rxBleClient;
+    private RxBleConnection.RxBleConnectionState rxBleConnectionState;
     private Disposable connection;
     private Disposable connectionListener;
     private Disposable queryListener;
@@ -127,7 +129,9 @@ public class OutputFragment extends Fragment {
     }
 
     private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState rxBleConnectionState) {
-        if (RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(rxBleConnectionState)) {
+        if (this.rxBleConnectionState != rxBleConnectionState
+                && RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(rxBleConnectionState)) {
+            this.rxBleConnectionState = rxBleConnectionState;
             connect(bluetooth);
         }
         getActivity().runOnUiThread(() -> {
@@ -140,15 +144,10 @@ public class OutputFragment extends Fragment {
     private void setUpDataQuery(RxBleConnection rxBleConnection) {
         if (isNotificationSupported) {
             queryListener = rxBleConnection.setupNotification(characteristicID)
-                    .doOnNext(
-                            notificationObservable -> {
-                                displayResult("notify set up");
-                            }
-                    )
                     .flatMap(notificationObservable -> notificationObservable)
                     .subscribe(
                             this::onResponseReceived,
-                            throwable -> displayResult(throwable.getMessage())
+                            throwable -> showToast(throwable.getMessage())
                     );
             return;
         }
@@ -157,8 +156,12 @@ public class OutputFragment extends Fragment {
                 .repeatWhen(completed -> completed.delay(3, TimeUnit.SECONDS))
                 .subscribe(
                         this::onResponseReceived,
-                        throwable -> displayResult(throwable.getMessage())
+                        throwable -> showToast(throwable.getMessage())
                 );
+    }
+
+    private void showToast(String message) {
+        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
     }
 
     private void onResponseReceived(byte[] bytes) {
@@ -170,7 +173,7 @@ public class OutputFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
                 binding.setValue(s);
-                binding.setInfo(time);
+                binding.setInfo(rxBleConnectionState.toString() + " " + time);
                 binding.setIsConnected(true);
             });
         }

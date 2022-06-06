@@ -29,25 +29,31 @@
                 android:id="@+id/heart_rate"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.25" />
+                android:layout_weight="0.2" />
 
             <FrameLayout
                 android:id="@+id/oximeter"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.25" />
+                android:layout_weight="0.2" />
 
             <FrameLayout
                 android:id="@+id/temperature"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.25" />
+                android:layout_weight="0.2" />
 
             <FrameLayout
                 android:id="@+id/weight"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="0.25" />
+                android:layout_weight="0.2" />
+
+            <FrameLayout
+                android:id="@+id/bp"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.2" />
         </LinearLayout>
 
         <LinearLayout
@@ -61,12 +67,19 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/scanning_please_wait" />
+                android:text="@string/scanning_please_wait"
+                android:textStyle="bold" />
 
             <ProgressBar
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/make_sure_devices_are_turned_on" />
         </LinearLayout>
 
     </RelativeLayout>

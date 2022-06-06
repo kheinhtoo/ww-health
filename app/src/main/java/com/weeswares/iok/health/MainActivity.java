@@ -41,16 +41,22 @@ public class MainActivity extends AppCompatActivity {
     private final static int LOCATION_REQUEST_CODE = 521;
     private final static int REQUEST_TURN_ON_BT = 522;
 
-    private static final String HEART_RATE_DEVICE = "BX02-7";// wearable
+    private static final String HEART_RATE_DEVICE = "BX02-7394";// wearable (confirmed)
     private static final String HEART_RATE_DEVICE_CHAR_ID = "000033f2-0000-1000-8000-00805f9b34fb";
-    private static final String OXI_METER_DEVICE = "Yuwell BP-YE670D";// oximeter
-    private static final String OXI_METER_DEVICE_CHAR_ID = "00002a35-0000-1000-8000-00805f9b34fb";
-    private static final String TEMPERATURE_DEVICE = "Bluetooth BP";// thermometer
-    private static final String TEMPERATURE_DEVICE_CHAR_ID = "0000fff1-0000-1000-8000-00805f9b34fb";
-    private static final String WEIGHT_DEVICE = "KS M6100P";// weight scale
-    private static final String WEIGHT_DEVICE_CHAR_ID = "0000fff1-0000-1000-8000-00805f9b34fb";
 
-    private OutputFragment heartRateFragment, temperatureFragment, oximeterFragment, weightFragment = null;
+    private static final String OXI_METER_DEVICE = "KS M6100P";// oximeter (3rd pair & 4th pair). (confirmed)
+    private static final String OXI_METER_DEVICE_CHAR_ID = "0000fff1-0000-1000-8000-00805f9b34fb";
+
+    private static final String BP_DEVICE = "Yuwell BP-YE670D";// BP.  (confirmed)
+    private static final String BP_DEVICE_CHAR_ID = "00002a35-0000-1000-8000-00805f9b34fb";
+
+    private static final String TEMPERATURE_DEVICE = "Bluetooth BP";// thermometer  (confirmed)
+    private static final String TEMPERATURE_DEVICE_CHAR_ID = "0000fff1-0000-1000-8000-00805f9b34fb";
+
+    private static final String WEIGHT_DEVICE = "MI_SCALE";// weight scale (confirmed)
+    private static final String WEIGHT_DEVICE_CHAR_ID = "00002a9d-0000-1000-8000-00805f9434fb";
+
+    private OutputFragment heartRateFragment, temperatureFragment, oximeterFragment, weightFragment, bpFragment = null;
 
     private ActivityMainBinding activityMainBinding;
     private BluetoothAdapter bluetoothAdapter;
@@ -157,19 +163,23 @@ public class MainActivity extends AppCompatActivity {
             if (b.getName().startsWith(HEART_RATE_DEVICE)) {
                 if (heartRateFragment != null) return;
                 heartRateFragment = OutputFragment.newInstance(b, "Heart Rate", HEART_RATE_DEVICE_CHAR_ID, true);
-                autoConnectedDevice(R.id.heart_rate, heartRateFragment);
+                displayFoundDevice(R.id.heart_rate, heartRateFragment);
             } else if (b.getName().startsWith(TEMPERATURE_DEVICE)) {
                 if (temperatureFragment != null) return;
                 temperatureFragment = OutputFragment.newInstance(b, "Temperature", TEMPERATURE_DEVICE_CHAR_ID, true);
-                autoConnectedDevice(R.id.heart_rate, temperatureFragment);
+                displayFoundDevice(R.id.heart_rate, temperatureFragment);
             } else if (b.getName().startsWith(OXI_METER_DEVICE)) {
                 if (oximeterFragment != null) return;
                 oximeterFragment = OutputFragment.newInstance(b, "Oximeter", OXI_METER_DEVICE_CHAR_ID, false);
-                autoConnectedDevice(R.id.heart_rate, oximeterFragment);
+                displayFoundDevice(R.id.heart_rate, oximeterFragment);
             } else if (b.getName().startsWith(WEIGHT_DEVICE)) {
                 if (weightFragment != null) return;
                 weightFragment = OutputFragment.newInstance(b, "Weight", WEIGHT_DEVICE_CHAR_ID, true);
-                autoConnectedDevice(R.id.heart_rate, weightFragment);
+                displayFoundDevice(R.id.heart_rate, weightFragment);
+            } else if (b.getName().startsWith(BP_DEVICE)) {
+                if (bpFragment != null) return;
+                bpFragment = OutputFragment.newInstance(b, "Blood Pressure", BP_DEVICE_CHAR_ID, true);
+                displayFoundDevice(R.id.bp, bpFragment);
             }
         }
         if (heartRateFragment != null
@@ -181,11 +191,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void autoConnectedDevice(int layoutID, Fragment f) {
+    private void displayFoundDevice(int layoutID, Fragment f) {
         activityMainBinding.loading.setVisibility(View.GONE);
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(layoutID, f)
+                .addToBackStack(null)
                 .commit();
     }
 
@@ -218,5 +229,4 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         iniBT();
     }
-
 }

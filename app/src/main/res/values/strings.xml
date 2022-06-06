@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">WW-Health</string>
-    <string name="scanning_please_wait">Scanning please wait ...</string>
+    <string name="scanning_please_wait">Scanning devices …</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="make_sure_devices_are_turned_on">Make sure devices are turned on.</string>
 </resources>
