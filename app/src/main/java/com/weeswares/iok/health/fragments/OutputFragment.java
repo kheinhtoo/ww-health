@@ -78,8 +78,6 @@ public class OutputFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         binding = DataBindingUtil.inflate(inflater, R.layout.fragment_output, container, false);
-        binding.setDevice(bluetooth);
-        binding.setTitle(title);
         return binding.getRoot();
     }
 
@@ -89,13 +87,8 @@ public class OutputFragment extends Fragment {
         binding.setTitle(title);
         binding.setDevice(bluetooth);
         binding.setValue("--");
+        init(getActivity());
         connect(bluetooth);
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        init(context);
     }
 
     @Override
@@ -125,25 +118,26 @@ public class OutputFragment extends Fragment {
                         this::onConnectionStateChanged,
                         throwable -> displayResult(throwable.getMessage())
                 );
-
     }
 
     private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState rxBleConnectionState) {
-        if (this.rxBleConnectionState != rxBleConnectionState
-                && RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(rxBleConnectionState)) {
+        if (this.rxBleConnectionState == null ||
+                (this.rxBleConnectionState != rxBleConnectionState
+                        && RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(rxBleConnectionState))) {
             this.rxBleConnectionState = rxBleConnectionState;
-            connect(bluetooth);
+            //connect(bluetooth);
         }
-        getActivity().runOnUiThread(() -> {
+        /*getActivity().runOnUiThread(() -> {
                     String time = getTimestamp();
                     binding.setInfo(rxBleConnectionState.toString() + " " + time);
                 }
-        );
+        );*/
     }
 
     private void setUpDataQuery(RxBleConnection rxBleConnection) {
         if (isNotificationSupported) {
-            queryListener = rxBleConnection.setupNotification(characteristicID)
+            queryListener = rxBleConnection
+                    .setupNotification(characteristicID)
                     .flatMap(notificationObservable -> notificationObservable)
                     .subscribe(
                             this::onResponseReceived,
@@ -173,7 +167,7 @@ public class OutputFragment extends Fragment {
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
                 binding.setValue(s);
-                binding.setInfo(rxBleConnectionState.toString() + " " + time);
+                binding.setInfo(time);
                 binding.setIsConnected(true);
             });
         }

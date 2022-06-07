@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Toast;
 
@@ -30,7 +31,10 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.weeswares.iok.health.databinding.ActivityMainBinding;
+import com.weeswares.iok.health.fragments.LogSheetDialogFragment;
 import com.weeswares.iok.health.fragments.OutputFragment;
 import com.weeswares.iok.health.helpers.Bluetooth;
 
@@ -103,9 +107,25 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            Toast.makeText(this, throwable.getMessage()
+                    , Toast.LENGTH_LONG).show();
+        });
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-
+        setSupportActionBar(activityMainBinding.toolbar);
         checkPermission();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        menu.findItem(R.id.logs).setOnMenuItemClickListener(menuItem -> {
+            LogSheetDialogFragment bottomSheetFragment = LogSheetDialogFragment.newInstance();
+//            ((BottomSheetDialog)bottomSheetFragment).getBehavior().setPeekHeight(400,true);
+            bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
+            return true;
+        });
+        return true;
     }
 
     @Override
