@@ -127,13 +127,14 @@ public class OutputFragment extends Fragment {
     }
 
     private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState connectionState, Activity context) {
-        if (this.rxBleConnectionState == null ||
-                (this.rxBleConnectionState != connectionState
-                        && RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(connectionState))) {
+        boolean isDisconnected = RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(connectionState);
+        if (this.rxBleConnectionState == null || (this.rxBleConnectionState != connectionState && isDisconnected)) {
             this.rxBleConnectionState = connectionState;
-            Log.d(TAG, "onConnectionStateChanged: about to reconnect " + bluetooth.getName() + " after " + connectionState);
-            disposables.clear();
-            connect(bluetooth, context);
+            if (isDisconnected) {
+                Log.d(TAG, "onConnectionStateChanged: about to reconnect " + bluetooth.getName() + " after " + connectionState);
+                disposables.clear();
+                connect(bluetooth, context);
+            }
         }
         context.runOnUiThread(() -> {
                     String time = getTimestamp();
@@ -152,7 +153,7 @@ public class OutputFragment extends Fragment {
                         .subscribe(
                                 this::onResponseReceived,
                                 throwable -> {
-                                    Log.e(TAG, "setUpDataQuery: ", throwable);
+                                    Log.e(TAG, "setupNotification: ", throwable);
                                     showToast(throwable.getMessage());
                                 }
                         ));
@@ -164,7 +165,7 @@ public class OutputFragment extends Fragment {
                     .subscribe(
                             this::onResponseReceived,
                             throwable -> {
-                                Log.e(TAG, "setUpDataQuery: ", throwable);
+                                Log.e(TAG, "setupIndication: ", throwable);
                                 showToast(throwable.getMessage());
                             }
                     ));
@@ -176,7 +177,7 @@ public class OutputFragment extends Fragment {
                 .subscribe(
                         this::onResponseReceived,
                         throwable -> {
-                            Log.e(TAG, "setUpDataQuery: ", throwable);
+                            Log.e(TAG, "readCharacteristic: ", throwable);
                             showToast(throwable.getMessage());
                         }
                 ));
