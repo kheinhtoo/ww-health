@@ -21,10 +21,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.view.Menu;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -36,7 +36,6 @@ import com.weeswares.iok.health.fragments.LogSheetDialogFragment;
 import com.weeswares.iok.health.fragments.OutputFragment;
 import com.weeswares.iok.health.helpers.Bluetooth;
 import com.weeswares.iok.health.helpers.HexString;
-import com.weeswares.iok.health.interfaces.ResultParser;
 
 import java.util.List;
 import java.util.Locale;
@@ -62,8 +61,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String WEIGHT_DEVICE = "MI_SCALE";// weight scale (confirmed)
     private static final String WEIGHT_DEVICE_CHAR_ID = "00002a9d-0000-1000-8000-00805f9b34fb";
-    private OutputFragment heartRateFragment, temperatureFragment, oximeterFragment, weightFragment, bpFragment = null;
-
+    private final OutputFragment heartRateFragment = OutputFragment.newInstance("Heart Rate", HEART_RATE_DEVICE_CHAR_ID, true, R.drawable.ic_heart_rate),
+            temperatureFragment = OutputFragment.newInstance("Temperature", TEMPERATURE_DEVICE_CHAR_ID, true, R.drawable.ic_temperature),
+            oximeterFragment = OutputFragment.newInstance("Oximeter", OXI_METER_DEVICE_CHAR_ID, false, R.drawable.ic_blood_oxygen),
+            weightFragment = OutputFragment.newInstance("Weight", WEIGHT_DEVICE_CHAR_ID, true, R.drawable.ic_weight),
+            bpFragment = OutputFragment.newInstance("Blood Pressure", BP_DEVICE_CHAR_ID, true, R.drawable.ic_blood_pressure);
     private ActivityMainBinding activityMainBinding;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner leScanner;
@@ -82,9 +84,9 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onScanFailed(int errorCode) {
-            if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
+            /*if (errorCode == SCAN_FAILED_ALREADY_STARTED) {
                 showToast("already start");
-            }
+            }*/
             if (errorCode == SCAN_FAILED_FEATURE_UNSUPPORTED) {
                 showToast("scan settings not supported");
             }
@@ -115,11 +117,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onPostCreate(@Nullable Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        displayFoundDevice(R.id.heart_rate, heartRateFragment);
+        displayFoundDevice(R.id.temperature, temperatureFragment);
+        displayFoundDevice(R.id.oximeter, oximeterFragment);
+        displayFoundDevice(R.id.weight, weightFragment);
+        displayFoundDevice(R.id.bp, bpFragment);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
         menu.findItem(R.id.logs).setOnMenuItemClickListener(menuItem -> {
             LogSheetDialogFragment bottomSheetFragment = LogSheetDialogFragment.newInstance();
-//            ((BottomSheetDialog)bottomSheetFragment).getBehavior().setPeekHeight(400,true);
             bottomSheetFragment.show(getSupportFragmentManager(), bottomSheetFragment.getTag());
             return true;
         });
@@ -179,47 +190,36 @@ public class MainActivity extends AppCompatActivity {
         if (device.getName() != null && device.getName().length() > 0) {
             Bluetooth b = new Bluetooth(device.getName(), device, result.getRssi());
             if (b.getName().startsWith(HEART_RATE_DEVICE)) {
-                if (heartRateFragment != null) return;
-                heartRateFragment = OutputFragment.newInstance(b, "Heart Rate", HEART_RATE_DEVICE_CHAR_ID, true);
-                heartRateFragment.setResultParser(response -> String.valueOf(response[3] & 0xFF));
-                displayFoundDevice(R.id.heart_rate, heartRateFragment);
+                heartRateFragment.setResultParser(response -> String.format(Locale.ENGLISH, "%d BPM", response[3] & 0xFF));
+                heartRateFragment.setBluetooth(b);
             } else if (b.getName().startsWith(TEMPERATURE_DEVICE)) {
-                if (temperatureFragment != null) return;
-                temperatureFragment = OutputFragment.newInstance(b, "Temperature", TEMPERATURE_DEVICE_CHAR_ID, true);
                 temperatureFragment.setResultParser(response -> {
-                    double fThermo = (response[5] - 0x30) * 10 + (response[6] - 0x30) + (response[8] - 0x30) * 0.1;
-                    return String.format(Locale.ENGLISH, "%.1f", fThermo);
+                    double temperature = (response[5] - 0x30) * 10 + (response[6] - 0x30) + (response[8] - 0x30) * 0.1;
+                    return String.format(Locale.ENGLISH, "%.1f \u00B0C", temperature);
                 });
-                displayFoundDevice(R.id.temperature, temperatureFragment);
+                temperatureFragment.setBluetooth(b);
             } else if (b.getName().startsWith(OXI_METER_DEVICE)) {
-                if (oximeterFragment != null) return;
-                oximeterFragment = OutputFragment.newInstance(b, "Oximeter", OXI_METER_DEVICE_CHAR_ID, false);
                 oximeterFragment.setResultParser(response -> String.format(Locale.ENGLISH, "%d %d", response[3] & 0xFF, response[4] & 0xFF));
-                displayFoundDevice(R.id.oximeter, oximeterFragment);
+                oximeterFragment.setBluetooth(b);
             } else if (b.getName().startsWith(WEIGHT_DEVICE)) {
-                if (weightFragment != null) return;
-                weightFragment = OutputFragment.newInstance(b, "Weight", WEIGHT_DEVICE_CHAR_ID, true);
-                weightFragment.setResultParser(response -> String.format(Locale.ENGLISH, "%.2f", HexString.calculateWeight(response)));
-                displayFoundDevice(R.id.weight, weightFragment);
+                weightFragment.setResultParser(response -> String.format(Locale.ENGLISH, "%.2f kg", HexString.calculateWeight(response)));
+                weightFragment.setBluetooth(b);
             } else if (b.getName().startsWith(BP_DEVICE)) {
-                if (bpFragment != null) return;
-                bpFragment = OutputFragment.newInstance(b, "Blood Pressure", BP_DEVICE_CHAR_ID, true);
-                bpFragment.setResultParser(response -> String.format(Locale.ENGLISH, "%d %d %d", response[1] & 0xFF, response[3] & 0xFF, response[14] & 0xFF));
-                displayFoundDevice(R.id.bp, bpFragment);
+                bpFragment.setResultParser(response -> String.format(Locale.ENGLISH, "%d/%d %d", response[1] & 0xFF, response[3] & 0xFF, response[14] & 0xFF));
+                bpFragment.setBluetooth(b);
             }
         }
-        if (heartRateFragment != null
-                && temperatureFragment != null
-                && oximeterFragment != null
-                && weightFragment != null
-                && bpFragment != null) {
+        if (heartRateFragment.getBluetooth() != null
+                && temperatureFragment.getBluetooth() != null
+                && oximeterFragment.getBluetooth() != null
+                && weightFragment.getBluetooth() != null
+                && bpFragment.getBluetooth() != null) {
             // if all devices are already found, stop the device scan.
             scanDevice(false);
         }
     }
 
     private void displayFoundDevice(int layoutID, Fragment f) {
-        activityMainBinding.loading.setVisibility(View.GONE);
         getSupportFragmentManager()
                 .beginTransaction()
                 .add(layoutID, f)

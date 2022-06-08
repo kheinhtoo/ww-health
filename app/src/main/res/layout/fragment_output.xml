@@ -8,6 +8,8 @@
 
         <import type="android.graphics.Color" />
 
+        <import type="androidx.core.content.ContextCompat" />
+
         <variable
             name="device"
             type="com.weeswares.iok.health.helpers.Bluetooth" />
@@ -15,6 +17,10 @@
         <variable
             name="title"
             type="String" />
+
+        <variable
+            name="icon"
+            type="Integer" />
 
         <variable
             name="value"
@@ -31,13 +37,16 @@
 
     <com.google.android.material.card.MaterialCardView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        app:contentPadding="16dp">
+        android:layout_height="match_parent"
+        android:elevation="0dp"
+        app:cardBackgroundColor="@color/card_bg"
+        app:contentPadding="16dp"
+        app:shapeAppearance="@android:color/transparent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
             android:orientation="vertical">
 
             <TextView
@@ -45,19 +54,65 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="@{title}"
+                android:textColor="@color/black"
+                android:textSize="28sp"
                 android:textStyle="bold"
                 tools:text="Heart Rate" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:gravity="center"
-                android:text='@{value}'
-                android:textSize="18sp"
-                android:textStyle="bold"
-                tools:text="49 bpm" />
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="115dp"
+                android:layout_height="115dp"
+                android:layout_marginVertical="16dp"
+                android:contentDescription="@string/icon"
+                android:src="@{ContextCompat.getDrawable(context,icon)}"
+                tools:src="@drawable/ic_blood_oxygen" />
+
+            <androidx.cardview.widget.CardView
+                android:layout_width="@dimen/progress_width"
+                android:layout_height="@dimen/progress_height"
+                android:clipChildren="true"
+                android:clipToPadding="true"
+                app:cardBackgroundColor="#3777FF"
+                app:cardCornerRadius="32dp">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <TextView
+                        android:id="@+id/value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:text='@{value}'
+                        android:textColor="@color/white"
+                        android:textSize="28sp"
+                        android:visibility="gone"
+                        tools:text="-" />
+
+                    <ImageView
+                        android:id="@+id/loading_icon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="@string/icon"
+                        android:src="@drawable/ic_loading"
+                        android:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/loading_txt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerInParent="true"
+                        android:gravity="center"
+                        android:text="@string/loading"
+                        android:textColor='@color/white'
+                        android:textSize="28sp"
+                        android:visibility="visible" />
+                </RelativeLayout>
+
+            </androidx.cardview.widget.CardView>
+
 
             <TextView
                 android:layout_width="match_parent"
@@ -65,16 +120,8 @@
                 android:gravity="center"
                 android:text='@{device.name}'
                 android:textSize="12sp"
+                android:visibility="gone"
                 tools:text="BX02-7394" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:text='@{info}'
-                android:textColor='@{isConnected?Color.parseColor("#03fc39"):Color.parseColor("#fc7f03")}'
-                android:textSize="11sp"
-                tools:text="Not connected" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

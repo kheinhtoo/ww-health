@@ -5,97 +5,91 @@
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:context=".MainActivity">
 
         <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/main_app_bar"
             android:layout_width="match_parent"
-            android:background="@android:color/transparent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent">
 
             <com.google.android.material.appbar.MaterialToolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:title="@string/app_name"
-                app:titleCentered="true" />
+                app:title="@string/health_dashboard"
+                app:titleCentered="false" />
 
         </com.google.android.material.appbar.AppBarLayout>
 
-        <RelativeLayout
+        <GridLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            tools:context=".MainActivity"
+            android:layout_margin="@dimen/grid_spacing"
+            android:columnCount="3"
+            android:orientation="vertical"
+            android:rowCount="2"
             app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
+            <FrameLayout
+                android:id="@+id/bp"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_row="0"
+                android:layout_rowWeight="1"
+                android:layout_column="0"
+                android:layout_columnWeight="1"
+                android:layout_marginEnd="@dimen/grid_spacing_inset"
+                android:layout_marginBottom="@dimen/grid_spacing_inset" />
 
-                <androidx.core.widget.NestedScrollView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+            <FrameLayout
+                android:id="@+id/temperature"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_row="0"
+                android:layout_rowWeight="1"
+                android:layout_column="1"
+                android:layout_columnWeight="1"
+                android:layout_marginStart="@dimen/grid_spacing_inset"
+                android:layout_marginEnd="@dimen/grid_spacing_inset"
+                android:layout_marginBottom="@dimen/grid_spacing_inset" />
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
+            <FrameLayout
+                android:id="@+id/heart_rate"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_row="0"
+                android:layout_rowWeight="1"
+                android:layout_column="2"
+                android:layout_columnWeight="1"
+                android:layout_marginStart="@dimen/grid_spacing_inset"
+                android:layout_marginBottom="@dimen/grid_spacing_inset" />
 
-                        <FrameLayout
-                            android:id="@+id/heart_rate"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+            <FrameLayout
+                android:id="@+id/weight"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_row="1"
+                android:layout_rowWeight="1"
+                android:layout_column="0"
+                android:layout_columnWeight="1"
+                android:layout_marginTop="@dimen/grid_spacing_inset"
+                android:layout_marginEnd="@dimen/grid_spacing_inset" />
 
-                        <FrameLayout
-                            android:id="@+id/oximeter"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
+            <FrameLayout
+                android:id="@+id/oximeter"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_row="1"
+                android:layout_rowWeight="1"
+                android:layout_column="1"
+                android:layout_columnWeight="1"
+                android:layout_marginStart="@dimen/grid_spacing_inset"
+                android:layout_marginTop="@dimen/grid_spacing_inset"
+                android:layout_marginEnd="@dimen/grid_spacing_inset" />
 
-                        <FrameLayout
-                            android:id="@+id/temperature"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <FrameLayout
-                            android:id="@+id/weight"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <FrameLayout
-                            android:id="@+id/bp"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-                    </LinearLayout>
-                </androidx.core.widget.NestedScrollView>
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/loading"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:gravity="center"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/scanning_please_wait"
-                    android:textStyle="bold" />
-
-                <ProgressBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:text="@string/make_sure_devices_are_turned_on" />
-            </LinearLayout>
-
-        </RelativeLayout>
+        </GridLayout>
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 </layout>

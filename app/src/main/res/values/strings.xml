@@ -5,4 +5,7 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="make_sure_devices_are_turned_on">Make sure devices are turned on.</string>
     <string name="logs">Logs</string>
+    <string name="health_dashboard">Health Dashboard</string>
+    <string name="icon">icon</string>
+    <string name="loading">Loading</string>
 </resources>

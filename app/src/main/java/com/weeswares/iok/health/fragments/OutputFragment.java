@@ -33,7 +33,7 @@ import io.reactivex.disposables.CompositeDisposable;
 public class OutputFragment extends Fragment {
     private static final String TAG = OutputFragment.class.toString();
 
-    private static final String ARG_PARAM1 = "device";
+    private static final String ARG_PARAM1 = "icon";
     private static final String ARG_PARAM2 = "title";
     private static final String ARG_PARAM3 = "characteristic_id";
     private static final String ARG_PARAM4 = "notification_support";
@@ -46,15 +46,16 @@ public class OutputFragment extends Fragment {
     private RxBleClient rxBleClient;
     private RxBleConnection.RxBleConnectionState rxBleConnectionState;
     private ResultParser resultParser;
+    private int icon;
 
     public OutputFragment() {
         // Required empty public constructor
     }
 
-    public static OutputFragment newInstance(Bluetooth b, String title, String charID, boolean notificationSupport) {
+    public static OutputFragment newInstance(String title, String charID, boolean notificationSupport, int icon) {
         OutputFragment fragment = new OutputFragment();
         Bundle args = new Bundle();
-        args.putSerializable(ARG_PARAM1, b);
+        args.putInt(ARG_PARAM1, icon);
         args.putString(ARG_PARAM2, title);
         args.putString(ARG_PARAM3, charID);
         args.putBoolean(ARG_PARAM4, notificationSupport);
@@ -66,11 +67,20 @@ public class OutputFragment extends Fragment {
         this.resultParser = resultParser;
     }
 
+    public void setBluetooth(Bluetooth bluetooth) {
+        this.bluetooth = bluetooth;
+        connect(bluetooth, getActivity());
+    }
+
+    public Bluetooth getBluetooth() {
+        return bluetooth;
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            bluetooth = (Bluetooth) getArguments().getSerializable(ARG_PARAM1);
+            icon = getArguments().getInt(ARG_PARAM1);
             title = getArguments().getString(ARG_PARAM2);
             characteristicID = UUID.fromString(getArguments().getString(ARG_PARAM3));
             isNotificationSupported = getArguments().getBoolean(ARG_PARAM4);
@@ -91,12 +101,12 @@ public class OutputFragment extends Fragment {
         binding.setTitle(title);
         binding.setDevice(bluetooth);
         binding.setValue("--");
+        binding.setIcon(icon);
         if (this.resultParser == null) {
             Toast.makeText(getActivity(), "Result parser is required.", Toast.LENGTH_SHORT).show();
             return;
         }
         init(getActivity());
-        connect(bluetooth, getActivity());
     }
 
     @Override
@@ -127,6 +137,7 @@ public class OutputFragment extends Fragment {
 
     private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState connectionState, Activity context) {
         boolean isDisconnected = RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(connectionState);
+        boolean isConnected = RxBleConnection.RxBleConnectionState.CONNECTED.equals(connectionState);
         if (this.rxBleConnectionState == null || this.rxBleConnectionState != connectionState) {
             this.rxBleConnectionState = connectionState;
             if (isDisconnected) {
@@ -137,7 +148,11 @@ public class OutputFragment extends Fragment {
         }
         context.runOnUiThread(() -> {
                     String time = getTimestamp();
-                    binding.setIsConnected(RxBleConnection.RxBleConnectionState.CONNECTED.equals(connectionState));
+                    binding.value.setVisibility(View.VISIBLE);
+                    binding.setValue("-");
+                    binding.loadingIcon.setVisibility(View.GONE);
+                    binding.loadingTxt.setVisibility(View.GONE);
+                    binding.setIsConnected(isConnected);
                     binding.setInfo(connectionState.toString() + " " + time);
                 }
         );
@@ -183,9 +198,9 @@ public class OutputFragment extends Fragment {
     }
 
     private void showToast(String message) {
-        if (getActivity() != null) {
+//        if (getActivity() != null) {
 //            getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show());
-        }
+//        }
     }
 
     private void onResponseReceived(byte[] bytes) {
@@ -197,7 +212,10 @@ public class OutputFragment extends Fragment {
         String time = getTimestamp();
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
+                binding.value.setVisibility(View.VISIBLE);
                 binding.setValue(resultParser.parse(s));
+                binding.loadingIcon.setVisibility(View.GONE);
+                binding.loadingTxt.setVisibility(View.GONE);
                 binding.setInfo(time);
                 binding.setIsConnected(true);
             });
