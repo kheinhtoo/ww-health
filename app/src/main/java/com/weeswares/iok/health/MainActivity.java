@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TEMPERATURE_DEVICE_CHAR_ID = "0000fff1-0000-1000-8000-00805f9b34fb";
 
     private static final String WEIGHT_DEVICE = "MI_SCALE";// weight scale (confirmed)
-    private static final String WEIGHT_DEVICE_CHAR_ID = "00002a9d-0000-1000-8000-00805f9434fb";
+    private static final String WEIGHT_DEVICE_CHAR_ID = "00002a9d-0000-1000-8000-00805f9b34fb";
 
     private OutputFragment heartRateFragment, temperatureFragment, oximeterFragment, weightFragment, bpFragment = null;
 
@@ -187,15 +187,15 @@ public class MainActivity extends AppCompatActivity {
             } else if (b.getName().startsWith(TEMPERATURE_DEVICE)) {
                 if (temperatureFragment != null) return;
                 temperatureFragment = OutputFragment.newInstance(b, "Temperature", TEMPERATURE_DEVICE_CHAR_ID, true);
-                displayFoundDevice(R.id.heart_rate, temperatureFragment);
+                displayFoundDevice(R.id.temperature, temperatureFragment);
             } else if (b.getName().startsWith(OXI_METER_DEVICE)) {
                 if (oximeterFragment != null) return;
                 oximeterFragment = OutputFragment.newInstance(b, "Oximeter", OXI_METER_DEVICE_CHAR_ID, false);
-                displayFoundDevice(R.id.heart_rate, oximeterFragment);
+                displayFoundDevice(R.id.oximeter, oximeterFragment);
             } else if (b.getName().startsWith(WEIGHT_DEVICE)) {
                 if (weightFragment != null) return;
                 weightFragment = OutputFragment.newInstance(b, "Weight", WEIGHT_DEVICE_CHAR_ID, true);
-                displayFoundDevice(R.id.heart_rate, weightFragment);
+                displayFoundDevice(R.id.weight, weightFragment);
             } else if (b.getName().startsWith(BP_DEVICE)) {
                 if (bpFragment != null) return;
                 bpFragment = OutputFragment.newInstance(b, "Blood Pressure", BP_DEVICE_CHAR_ID, true);
@@ -205,7 +205,8 @@ public class MainActivity extends AppCompatActivity {
         if (heartRateFragment != null
                 && temperatureFragment != null
                 && oximeterFragment != null
-                && weightFragment != null) {
+                && weightFragment != null
+                && bpFragment != null) {
             // if all devices are already found, stop the device scan.
             scanDevice(false);
         }

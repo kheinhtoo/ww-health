@@ -2,6 +2,7 @@ package com.weeswares.iok.health.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -110,13 +111,16 @@ public class OutputFragment extends Fragment {
         connection = device.establishConnection(false) // <-- autoConnect flag
                 .subscribe(
                         this::setUpDataQuery,
-                        throwable -> displayResult(throwable.getMessage())
+                        throwable -> {
+                            Log.d(TAG, "connect:" + throwable.getMessage());
+//                            connect(b);
+                        }
                 );
 
         connectionListener = device.observeConnectionStateChanges()
                 .subscribe(
                         this::onConnectionStateChanged,
-                        throwable -> displayResult(throwable.getMessage())
+                        throwable -> Log.d(TAG, "connectStateChanged:" + throwable.getMessage())
                 );
     }
 
@@ -125,19 +129,19 @@ public class OutputFragment extends Fragment {
                 (this.rxBleConnectionState != rxBleConnectionState
                         && RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(rxBleConnectionState))) {
             this.rxBleConnectionState = rxBleConnectionState;
-            //connect(bluetooth);
+            connect(bluetooth);
         }
-        /*getActivity().runOnUiThread(() -> {
+        getActivity().runOnUiThread(() -> {
                     String time = getTimestamp();
                     binding.setInfo(rxBleConnectionState.toString() + " " + time);
                 }
-        );*/
+        );
     }
 
     private void setUpDataQuery(RxBleConnection rxBleConnection) {
         if (isNotificationSupported) {
             queryListener = rxBleConnection
-                    .setupNotification(characteristicID)
+                    .setupIndication(characteristicID)
                     .flatMap(notificationObservable -> notificationObservable)
                     .subscribe(
                             this::onResponseReceived,
