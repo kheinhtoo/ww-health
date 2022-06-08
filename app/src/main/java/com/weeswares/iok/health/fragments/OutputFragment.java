@@ -128,12 +128,12 @@ public class OutputFragment extends Fragment {
 
     private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState connectionState, Activity context) {
         boolean isDisconnected = RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(connectionState);
-        if (this.rxBleConnectionState == null || (this.rxBleConnectionState != connectionState && isDisconnected)) {
+        if (this.rxBleConnectionState == null || this.rxBleConnectionState != connectionState) {
             this.rxBleConnectionState = connectionState;
             if (isDisconnected) {
                 Log.d(TAG, "onConnectionStateChanged: about to reconnect " + bluetooth.getName() + " after " + connectionState);
                 disposables.clear();
-                connect(bluetooth, context);
+                binding.getRoot().postDelayed(() -> connect(bluetooth, context), 3000);
             }
         }
         context.runOnUiThread(() -> {
