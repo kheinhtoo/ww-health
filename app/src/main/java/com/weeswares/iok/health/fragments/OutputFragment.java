@@ -26,7 +26,7 @@ import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class OutputFragment extends Fragment {
     private static final String TAG = OutputFragment.class.toString();
@@ -35,18 +35,14 @@ public class OutputFragment extends Fragment {
     private static final String ARG_PARAM2 = "title";
     private static final String ARG_PARAM3 = "characteristic_id";
     private static final String ARG_PARAM4 = "notification_support";
-
+    private final CompositeDisposable disposables = new CompositeDisposable();
     private Bluetooth bluetooth;
     private String title;
     private UUID characteristicID;
     private boolean isNotificationSupported;
-
     private FragmentOutputBinding binding;
     private RxBleClient rxBleClient;
     private RxBleConnection.RxBleConnectionState rxBleConnectionState;
-    private Disposable connection;
-    private Disposable connectionListener;
-    private Disposable queryListener;
 
     public OutputFragment() {
         // Required empty public constructor
@@ -93,12 +89,9 @@ public class OutputFragment extends Fragment {
     }
 
     @Override
-    public void onDetach() {
-        if (connection != null && !connection.isDisposed()) connection.dispose();
-        if (connectionListener != null && !connectionListener.isDisposed())
-            connectionListener.dispose();
-        if (queryListener != null && !queryListener.isDisposed()) queryListener.dispose();
-        super.onDetach();
+    public void onStop() {
+        disposables.clear();
+        super.onStop();
     }
 
     private void init(Context context) {
@@ -108,20 +101,20 @@ public class OutputFragment extends Fragment {
     void connect(Bluetooth b) {
         if (b == null) return;
         RxBleDevice device = rxBleClient.getBleDevice(b.getMacAddr());
-        connection = device.establishConnection(false) // <-- autoConnect flag
+        disposables.add(device.establishConnection(false) // <-- autoConnect flag
                 .subscribe(
                         this::setUpDataQuery,
                         throwable -> {
                             Log.d(TAG, "connect:" + throwable.getMessage());
 //                            connect(b);
                         }
-                );
+                ));
 
-        connectionListener = device.observeConnectionStateChanges()
+        disposables.add(device.observeConnectionStateChanges()
                 .subscribe(
                         this::onConnectionStateChanged,
                         throwable -> Log.d(TAG, "connectStateChanged:" + throwable.getMessage())
-                );
+                ));
     }
 
     private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState rxBleConnectionState) {
@@ -140,22 +133,22 @@ public class OutputFragment extends Fragment {
 
     private void setUpDataQuery(RxBleConnection rxBleConnection) {
         if (isNotificationSupported) {
-            queryListener = rxBleConnection
+            disposables.add(rxBleConnection
                     .setupIndication(characteristicID)
                     .flatMap(notificationObservable -> notificationObservable)
                     .subscribe(
                             this::onResponseReceived,
                             throwable -> showToast(throwable.getMessage())
-                    );
+                    ));
             return;
         }
-        queryListener = rxBleConnection
+        disposables.add(rxBleConnection
                 .readCharacteristic(characteristicID)
                 .repeatWhen(completed -> completed.delay(3, TimeUnit.SECONDS))
                 .subscribe(
                         this::onResponseReceived,
                         throwable -> showToast(throwable.getMessage())
-                );
+                ));
     }
 
     private void showToast(String message) {
@@ -167,6 +160,7 @@ public class OutputFragment extends Fragment {
     }
 
     private void displayResult(String s) {
+        Log.d(TAG, "displayResult: "+bluetooth.getName()+" = "+s);
         String time = getTimestamp();
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
