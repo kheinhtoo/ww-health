@@ -138,7 +138,10 @@ public class OutputFragment extends Fragment {
                     .flatMap(notificationObservable -> notificationObservable)
                     .subscribe(
                             this::onResponseReceived,
-                            throwable -> showToast(throwable.getMessage())
+                            throwable -> {
+                                Log.e(TAG, "setUpDataQuery: ", throwable);
+                                showToast(throwable.getMessage());
+                            }
                     ));
             return;
         }
@@ -147,12 +150,19 @@ public class OutputFragment extends Fragment {
                 .repeatWhen(completed -> completed.delay(3, TimeUnit.SECONDS))
                 .subscribe(
                         this::onResponseReceived,
-                        throwable -> showToast(throwable.getMessage())
+                        throwable -> {
+                            Log.e(TAG, "setUpDataQuery: ", throwable);
+                            showToast(throwable.getMessage());
+                        }
                 ));
     }
 
     private void showToast(String message) {
-        Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+        if (getActivity() != null) {
+            getActivity().runOnUiThread(() -> {
+                Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+            });
+        }
     }
 
     private void onResponseReceived(byte[] bytes) {
@@ -160,7 +170,7 @@ public class OutputFragment extends Fragment {
     }
 
     private void displayResult(String s) {
-        Log.d(TAG, "displayResult: "+bluetooth.getName()+" = "+s);
+        Log.d(TAG, "displayResult: " + bluetooth.getName() + " = " + s);
         String time = getTimestamp();
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
