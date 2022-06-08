@@ -21,7 +21,6 @@ import com.weeswares.iok.health.MainActivity;
 import com.weeswares.iok.health.R;
 import com.weeswares.iok.health.databinding.FragmentOutputBinding;
 import com.weeswares.iok.health.helpers.Bluetooth;
-import com.weeswares.iok.health.helpers.HexString;
 import com.weeswares.iok.health.interfaces.ResultParser;
 
 import java.text.SimpleDateFormat;
@@ -185,15 +184,15 @@ public class OutputFragment extends Fragment {
 
     private void showToast(String message) {
         if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show());
+//            getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show());
         }
     }
 
     private void onResponseReceived(byte[] bytes) {
-        displayResult(HexString.bytesToHex(bytes));
+        displayResult(bytes);
     }
 
-    private void displayResult(char[] s) {
+    private void displayResult(byte[] s) {
         Log.d(TAG, "displayResult: " + bluetooth.getName() + " = " + new String(s));
         String time = getTimestamp();
         if (getActivity() != null) {

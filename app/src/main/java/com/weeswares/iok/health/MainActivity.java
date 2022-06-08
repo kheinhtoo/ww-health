@@ -35,9 +35,11 @@ import com.weeswares.iok.health.databinding.ActivityMainBinding;
 import com.weeswares.iok.health.fragments.LogSheetDialogFragment;
 import com.weeswares.iok.health.fragments.OutputFragment;
 import com.weeswares.iok.health.helpers.Bluetooth;
+import com.weeswares.iok.health.helpers.HexString;
 import com.weeswares.iok.health.interfaces.ResultParser;
 
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -107,10 +109,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
-            Toast.makeText(this, throwable.getMessage()
-                    , Toast.LENGTH_LONG).show();
-        });
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         setSupportActionBar(activityMainBinding.toolbar);
         checkPermission();
@@ -183,52 +181,30 @@ public class MainActivity extends AppCompatActivity {
             if (b.getName().startsWith(HEART_RATE_DEVICE)) {
                 if (heartRateFragment != null) return;
                 heartRateFragment = OutputFragment.newInstance(b, "Heart Rate", HEART_RATE_DEVICE_CHAR_ID, true);
-                heartRateFragment.setResultParser(new ResultParser() {
-                    @Override
-                    public String parse(char[] hexChars) {
-                        return new String(hexChars);
-                    }
-                });
+                heartRateFragment.setResultParser(response -> String.valueOf(response[3] & 0xFF));
                 displayFoundDevice(R.id.heart_rate, heartRateFragment);
             } else if (b.getName().startsWith(TEMPERATURE_DEVICE)) {
                 if (temperatureFragment != null) return;
                 temperatureFragment = OutputFragment.newInstance(b, "Temperature", TEMPERATURE_DEVICE_CHAR_ID, true);
-                temperatureFragment.setResultParser(new ResultParser() {
-                    @Override
-                    public String parse(char[] hexChars) {
-                        return new String(hexChars);
-                    }
+                temperatureFragment.setResultParser(response -> {
+                    double fThermo = (response[5] - 0x30) * 10 + (response[6] - 0x30) + (response[8] - 0x30) * 0.1;
+                    return String.format(Locale.ENGLISH, "%.1f", fThermo);
                 });
                 displayFoundDevice(R.id.temperature, temperatureFragment);
             } else if (b.getName().startsWith(OXI_METER_DEVICE)) {
                 if (oximeterFragment != null) return;
                 oximeterFragment = OutputFragment.newInstance(b, "Oximeter", OXI_METER_DEVICE_CHAR_ID, false);
-                oximeterFragment.setResultParser(new ResultParser() {
-                    @Override
-                    public String parse(char[] hexChars) {
-                        return new String(hexChars);
-                    }
-                });
+                oximeterFragment.setResultParser(response -> String.format(Locale.ENGLISH, "%d %d", response[3] & 0xFF, response[4] & 0xFF));
                 displayFoundDevice(R.id.oximeter, oximeterFragment);
             } else if (b.getName().startsWith(WEIGHT_DEVICE)) {
                 if (weightFragment != null) return;
                 weightFragment = OutputFragment.newInstance(b, "Weight", WEIGHT_DEVICE_CHAR_ID, true);
-                weightFragment.setResultParser(new ResultParser() {
-                    @Override
-                    public String parse(char[] hexChars) {
-                        return new String(hexChars);
-                    }
-                });
+                weightFragment.setResultParser(response -> String.format(Locale.ENGLISH, "%.2f", HexString.calculateWeight(response)));
                 displayFoundDevice(R.id.weight, weightFragment);
             } else if (b.getName().startsWith(BP_DEVICE)) {
                 if (bpFragment != null) return;
                 bpFragment = OutputFragment.newInstance(b, "Blood Pressure", BP_DEVICE_CHAR_ID, true);
-                bpFragment.setResultParser(new ResultParser() {
-                    @Override
-                    public String parse(char[] hexChars) {
-                        return new String(hexChars);
-                    }
-                });
+                bpFragment.setResultParser(response -> String.format(Locale.ENGLISH, "%d %d %d", response[1] & 0xFF, response[3] & 0xFF, response[14] & 0xFF));
                 displayFoundDevice(R.id.bp, bpFragment);
             }
         }

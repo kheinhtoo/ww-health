@@ -46,10 +46,12 @@ public class HexString {
         return data;
     }
 
-    public static void calculateWeight(byte[] bytes) {
+    public static double calculateWeight(byte[] bytes) {
         int integerVal = byteArrayToShortLE(bytes, 1);
         System.out.println("Integer = " + integerVal);
-        System.out.println("Actual weight =" + (integerVal * 0.005));
+        double actualWeight = (integerVal * 0.005);
+        System.out.println("Actual weight =" + actualWeight);
+        return actualWeight;
     }
 
     public static void calculateTemperature(byte[] bytes) {

@@ -1,5 +1,5 @@
 package com.weeswares.iok.health.interfaces;
 
 public interface ResultParser {
-    public String parse(char[] hexChars);
+    public String parse(byte[] hexChars);
 }
