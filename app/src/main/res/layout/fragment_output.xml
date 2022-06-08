@@ -56,7 +56,6 @@
                 android:text="@{title}"
                 android:textColor="@color/black"
                 android:textSize="28sp"
-                android:textStyle="bold"
                 tools:text="Heart Rate" />
 
             <ImageView
