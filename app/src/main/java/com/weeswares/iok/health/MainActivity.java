@@ -35,6 +35,7 @@ import com.weeswares.iok.health.databinding.ActivityMainBinding;
 import com.weeswares.iok.health.fragments.LogSheetDialogFragment;
 import com.weeswares.iok.health.fragments.OutputFragment;
 import com.weeswares.iok.health.helpers.Bluetooth;
+import com.weeswares.iok.health.interfaces.ResultParser;
 
 import java.util.List;
 
@@ -182,22 +183,52 @@ public class MainActivity extends AppCompatActivity {
             if (b.getName().startsWith(HEART_RATE_DEVICE)) {
                 if (heartRateFragment != null) return;
                 heartRateFragment = OutputFragment.newInstance(b, "Heart Rate", HEART_RATE_DEVICE_CHAR_ID, true);
+                heartRateFragment.setResultParser(new ResultParser() {
+                    @Override
+                    public String parse(char[] hexChars) {
+                        return new String(hexChars);
+                    }
+                });
                 displayFoundDevice(R.id.heart_rate, heartRateFragment);
             } else if (b.getName().startsWith(TEMPERATURE_DEVICE)) {
                 if (temperatureFragment != null) return;
                 temperatureFragment = OutputFragment.newInstance(b, "Temperature", TEMPERATURE_DEVICE_CHAR_ID, true);
+                temperatureFragment.setResultParser(new ResultParser() {
+                    @Override
+                    public String parse(char[] hexChars) {
+                        return new String(hexChars);
+                    }
+                });
                 displayFoundDevice(R.id.temperature, temperatureFragment);
             } else if (b.getName().startsWith(OXI_METER_DEVICE)) {
                 if (oximeterFragment != null) return;
                 oximeterFragment = OutputFragment.newInstance(b, "Oximeter", OXI_METER_DEVICE_CHAR_ID, false);
+                oximeterFragment.setResultParser(new ResultParser() {
+                    @Override
+                    public String parse(char[] hexChars) {
+                        return new String(hexChars);
+                    }
+                });
                 displayFoundDevice(R.id.oximeter, oximeterFragment);
             } else if (b.getName().startsWith(WEIGHT_DEVICE)) {
                 if (weightFragment != null) return;
                 weightFragment = OutputFragment.newInstance(b, "Weight", WEIGHT_DEVICE_CHAR_ID, true);
+                weightFragment.setResultParser(new ResultParser() {
+                    @Override
+                    public String parse(char[] hexChars) {
+                        return new String(hexChars);
+                    }
+                });
                 displayFoundDevice(R.id.weight, weightFragment);
             } else if (b.getName().startsWith(BP_DEVICE)) {
                 if (bpFragment != null) return;
                 bpFragment = OutputFragment.newInstance(b, "Blood Pressure", BP_DEVICE_CHAR_ID, true);
+                bpFragment.setResultParser(new ResultParser() {
+                    @Override
+                    public String parse(char[] hexChars) {
+                        return new String(hexChars);
+                    }
+                });
                 displayFoundDevice(R.id.bp, bpFragment);
             }
         }

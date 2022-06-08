@@ -21,6 +21,7 @@ import com.weeswares.iok.health.R;
 import com.weeswares.iok.health.databinding.FragmentOutputBinding;
 import com.weeswares.iok.health.helpers.Bluetooth;
 import com.weeswares.iok.health.helpers.HexString;
+import com.weeswares.iok.health.interfaces.ResultParser;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
@@ -44,6 +45,7 @@ public class OutputFragment extends Fragment {
     private FragmentOutputBinding binding;
     private RxBleClient rxBleClient;
     private RxBleConnection.RxBleConnectionState rxBleConnectionState;
+    private ResultParser resultParser;
 
     public OutputFragment() {
         // Required empty public constructor
@@ -58,6 +60,10 @@ public class OutputFragment extends Fragment {
         args.putBoolean(ARG_PARAM4, notificationSupport);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    public void setResultParser(ResultParser resultParser) {
+        this.resultParser = resultParser;
     }
 
     @Override
@@ -85,6 +91,10 @@ public class OutputFragment extends Fragment {
         binding.setTitle(title);
         binding.setDevice(bluetooth);
         binding.setValue("--");
+        if (this.resultParser == null) {
+            Toast.makeText(getActivity(), "Result parser is required.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         init(getActivity());
         connect(bluetooth);
     }
@@ -183,12 +193,12 @@ public class OutputFragment extends Fragment {
         displayResult(HexString.bytesToHex(bytes));
     }
 
-    private void displayResult(String s) {
-        Log.d(TAG, "displayResult: " + bluetooth.getName() + " = " + s);
+    private void displayResult(char[] s) {
+        Log.d(TAG, "displayResult: " + bluetooth.getName() + " = " + new String(s));
         String time = getTimestamp();
         if (getActivity() != null) {
             getActivity().runOnUiThread(() -> {
-                binding.setValue(s);
+                binding.setValue(resultParser.parse(s));
                 binding.setInfo(time);
                 binding.setIsConnected(true);
             });
