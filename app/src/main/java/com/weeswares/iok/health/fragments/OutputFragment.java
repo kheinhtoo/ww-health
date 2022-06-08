@@ -126,17 +126,18 @@ public class OutputFragment extends Fragment {
                 ));
     }
 
-    private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState rxBleConnectionState, Activity context) {
+    private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState connectionState, Activity context) {
         if (this.rxBleConnectionState == null ||
-                (this.rxBleConnectionState != rxBleConnectionState
-                        && RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(rxBleConnectionState))) {
-            this.rxBleConnectionState = rxBleConnectionState;
+                (this.rxBleConnectionState != connectionState
+                        && RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(connectionState))) {
+            this.rxBleConnectionState = connectionState;
+            Log.d(TAG, "onConnectionStateChanged: about to reconnect " + bluetooth.getName() + " after " + connectionState);
             connect(bluetooth, context);
         }
         context.runOnUiThread(() -> {
                     String time = getTimestamp();
-                    binding.setIsConnected(RxBleConnection.RxBleConnectionState.CONNECTED.equals(rxBleConnectionState));
-                    binding.setInfo(rxBleConnectionState.toString() + " " + time);
+                    binding.setIsConnected(RxBleConnection.RxBleConnectionState.CONNECTED.equals(connectionState));
+                    binding.setInfo(connectionState.toString() + " " + time);
                 }
         );
     }
