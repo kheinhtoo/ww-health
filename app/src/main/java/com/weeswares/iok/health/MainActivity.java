@@ -31,8 +31,6 @@ import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.material.bottomsheet.BottomSheetDialog;
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.weeswares.iok.health.databinding.ActivityMainBinding;
 import com.weeswares.iok.health.fragments.LogSheetDialogFragment;
 import com.weeswares.iok.health.fragments.OutputFragment;
@@ -45,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private final static int LOCATION_REQUEST_CODE = 521;
     private final static int REQUEST_TURN_ON_BT = 522;
 
+
     private static final String HEART_RATE_DEVICE = "BX02-7394";// wearable (confirmed)
     private static final String HEART_RATE_DEVICE_CHAR_ID = "000033f2-0000-1000-8000-00805f9b34fb";
 
@@ -55,11 +54,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String BP_DEVICE_CHAR_ID = "00002a35-0000-1000-8000-00805f9b34fb";
 
     private static final String TEMPERATURE_DEVICE = "Bluetooth BP";// thermometer  (confirmed)
+    public static final String TEMP_DEVICE_NAME = TEMPERATURE_DEVICE;
     private static final String TEMPERATURE_DEVICE_CHAR_ID = "0000fff1-0000-1000-8000-00805f9b34fb";
 
     private static final String WEIGHT_DEVICE = "MI_SCALE";// weight scale (confirmed)
     private static final String WEIGHT_DEVICE_CHAR_ID = "00002a9d-0000-1000-8000-00805f9b34fb";
-
     private OutputFragment heartRateFragment, temperatureFragment, oximeterFragment, weightFragment, bpFragment = null;
 
     private ActivityMainBinding activityMainBinding;

@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.polidea.rxandroidble2.RxBleClient;
 import com.polidea.rxandroidble2.RxBleConnection;
 import com.polidea.rxandroidble2.RxBleDevice;
+import com.weeswares.iok.health.MainActivity;
 import com.weeswares.iok.health.R;
 import com.weeswares.iok.health.databinding.FragmentOutputBinding;
 import com.weeswares.iok.health.helpers.Bluetooth;
@@ -133,6 +134,19 @@ public class OutputFragment extends Fragment {
 
     private void setUpDataQuery(RxBleConnection rxBleConnection) {
         if (isNotificationSupported) {
+            if (bluetooth.getName().startsWith(MainActivity.TEMP_DEVICE_NAME)) {
+                disposables.add(rxBleConnection
+                        .setupNotification(characteristicID)
+                        .flatMap(notificationObservable -> notificationObservable)
+                        .subscribe(
+                                this::onResponseReceived,
+                                throwable -> {
+                                    Log.e(TAG, "setUpDataQuery: ", throwable);
+                                    showToast(throwable.getMessage());
+                                }
+                        ));
+                return;
+            }
             disposables.add(rxBleConnection
                     .setupIndication(characteristicID)
                     .flatMap(notificationObservable -> notificationObservable)
