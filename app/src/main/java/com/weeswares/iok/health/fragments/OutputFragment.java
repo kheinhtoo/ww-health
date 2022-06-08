@@ -1,5 +1,6 @@
 package com.weeswares.iok.health.fragments;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
@@ -96,7 +97,7 @@ public class OutputFragment extends Fragment {
             return;
         }
         init(getActivity());
-        connect(bluetooth);
+        connect(bluetooth, getActivity());
     }
 
     @Override
@@ -109,34 +110,32 @@ public class OutputFragment extends Fragment {
         rxBleClient = RxBleClient.create(context);
     }
 
-    void connect(Bluetooth b) {
+    void connect(Bluetooth b, Activity context) {
         if (b == null) return;
         RxBleDevice device = rxBleClient.getBleDevice(b.getMacAddr());
         disposables.add(device.establishConnection(false) // <-- autoConnect flag
                 .subscribe(
                         this::setUpDataQuery,
-                        throwable -> {
-                            Log.d(TAG, "connect:" + throwable.getMessage());
-//                            connect(b);
-                        }
+                        throwable -> Log.d(TAG, "connect:" + throwable.getMessage())
                 ));
 
         disposables.add(device.observeConnectionStateChanges()
                 .subscribe(
-                        this::onConnectionStateChanged,
+                        rxBleConnectionState1 -> onConnectionStateChanged(rxBleConnectionState1, context),
                         throwable -> Log.d(TAG, "connectStateChanged:" + throwable.getMessage())
                 ));
     }
 
-    private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState rxBleConnectionState) {
+    private void onConnectionStateChanged(RxBleConnection.RxBleConnectionState rxBleConnectionState, Activity context) {
         if (this.rxBleConnectionState == null ||
                 (this.rxBleConnectionState != rxBleConnectionState
                         && RxBleConnection.RxBleConnectionState.DISCONNECTED.equals(rxBleConnectionState))) {
             this.rxBleConnectionState = rxBleConnectionState;
-            connect(bluetooth);
+            connect(bluetooth, context);
         }
-        getActivity().runOnUiThread(() -> {
+        context.runOnUiThread(() -> {
                     String time = getTimestamp();
+                    binding.setIsConnected(RxBleConnection.RxBleConnectionState.CONNECTED.equals(rxBleConnectionState));
                     binding.setInfo(rxBleConnectionState.toString() + " " + time);
                 }
         );
@@ -183,9 +182,7 @@ public class OutputFragment extends Fragment {
 
     private void showToast(String message) {
         if (getActivity() != null) {
-            getActivity().runOnUiThread(() -> {
-                Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
-            });
+            getActivity().runOnUiThread(() -> Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show());
         }
     }
 
