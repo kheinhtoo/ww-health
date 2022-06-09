@@ -222,8 +222,7 @@ public class MainActivity extends AppCompatActivity {
     private void displayFoundDevice(int layoutID, Fragment f) {
         getSupportFragmentManager()
                 .beginTransaction()
-                .add(layoutID, f)
-                .addToBackStack(null)
+                .replace(layoutID, f)
                 .commit();
     }
 
