@@ -61,11 +61,11 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String WEIGHT_DEVICE = "MI_SCALE";// weight scale (confirmed)
     private static final String WEIGHT_DEVICE_CHAR_ID = "00002a9d-0000-1000-8000-00805f9b34fb";
-    private final OutputFragment heartRateFragment = OutputFragment.newInstance("Heart Rate", HEART_RATE_DEVICE_CHAR_ID, true, R.drawable.ic_heart_rate),
+    private final OutputFragment heartRateFragment = OutputFragment.newInstance("Heart rate", HEART_RATE_DEVICE_CHAR_ID, true, R.drawable.ic_heart_rate),
             temperatureFragment = OutputFragment.newInstance("Temperature", TEMPERATURE_DEVICE_CHAR_ID, true, R.drawable.ic_temperature),
-            oximeterFragment = OutputFragment.newInstance("Oximeter", OXI_METER_DEVICE_CHAR_ID, false, R.drawable.ic_blood_oxygen),
+            oximeterFragment = OutputFragment.newInstance("Blood oxygen", OXI_METER_DEVICE_CHAR_ID, false, R.drawable.ic_blood_oxygen),
             weightFragment = OutputFragment.newInstance("Weight", WEIGHT_DEVICE_CHAR_ID, true, R.drawable.ic_weight),
-            bpFragment = OutputFragment.newInstance("Blood Pressure", BP_DEVICE_CHAR_ID, true, R.drawable.ic_blood_pressure);
+            bpFragment = OutputFragment.newInstance("Blood pressure", BP_DEVICE_CHAR_ID, true, R.drawable.ic_blood_pressure);
     private ActivityMainBinding activityMainBinding;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothLeScanner leScanner;

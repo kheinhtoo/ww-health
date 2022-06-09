@@ -102,10 +102,6 @@ public class OutputFragment extends Fragment {
         binding.setDevice(bluetooth);
         binding.setValue("--");
         binding.setIcon(icon);
-        if (this.resultParser == null) {
-            Toast.makeText(getActivity(), "Result parser is required.", Toast.LENGTH_SHORT).show();
-            return;
-        }
         init(getActivity());
     }
 
@@ -121,6 +117,10 @@ public class OutputFragment extends Fragment {
 
     void connect(Bluetooth b, Activity context) {
         if (b == null) return;
+        if (this.resultParser == null) {
+            Toast.makeText(getActivity(), "Result parser is required.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         RxBleDevice device = rxBleClient.getBleDevice(b.getMacAddr());
         disposables.add(device.establishConnection(false) // <-- autoConnect flag
                 .subscribe(
